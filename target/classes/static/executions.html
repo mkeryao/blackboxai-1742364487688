@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execution Records - JobFlow</title>
+    
+    <!-- Local Tailwind CSS -->
+    <script src="/lib/tailwind/tailwind.min.js"></script>
+    
+    <!-- Local Fonts -->
+    <link href="/lib/fonts/inter.css" rel="stylesheet">
+    
+    <!-- Local Font Awesome -->
+    <link rel="stylesheet" href="/lib/fontawesome/css/local-icons.css">
+    
+    <!-- Local Chart.js -->
+    <script src="/lib/chart/chart.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <img class="h-8 w-auto" src="/images/logo.svg" alt="JobFlow">
+                        <span class="ml-2 text-xl font-bold text-gray-800">JobFlow</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="/index.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
+                        <a href="/tasks.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Tasks</a>
+                        <a href="/workflows.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Workflows</a>
+                        <a href="/executions.html" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Executions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="md:flex md:items-center md:justify-between mb-6">
+            <div class="flex-1 min-w-0">
+                <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Execution Records</h2>
+            </div>
+            <div class="mt-4 flex md:mt-0 md:ml-4">
+                <button type="button" id="exportBtn" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-download mr-2"></i>
+                    Export
+                </button>
+                <button type="button" id="refreshBtn" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-4 mb-6">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Success Rate</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900" id="successRate">0%</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-clock text-2xl text-blue-500"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Average Duration</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900" id="avgDuration">0s</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-play-circle text-2xl text-purple-500"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Executions</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900" id="totalExecutions">0</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-2xl text-red-500"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Failed Executions</dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900" id="failedExecutions">0</div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Execution Records Table -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex flex-col">
+                    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                            <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID/Type</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Time</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Executor</th>
+                                            <th scope="col" class="relative px-6 py-3">
+                                                <span class="sr-only">Actions</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="executionRecords" class="bg-white divide-y divide-gray-200">
+                                        <!-- Records will be inserted here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadExecutionRecords();
+            loadStatistics();
+            setupEventListeners();
+        });
+
+        async function loadExecutionRecords() {
+            try {
+                const loader = JobFlow.UI.showLoading();
+                const records = await JobFlow.api.getExecutionRecords();
+                renderExecutionRecords(records);
+                JobFlow.UI.hideLoading(loader);
+            } catch (error) {
+                JobFlow.UI.showNotification(error.message, 'error');
+            }
+        }
+
+        async function loadStatistics() {
+            try {
+                const stats = await JobFlow.api.getExecutionMetrics();
+                updateStatistics(stats);
+            } catch (error) {
+                JobFlow.UI.showNotification(error.message, 'error');
+            }
+        }
+
+        function renderExecutionRecords(records) {
+            const tbody = document.getElementById('executionRecords');
+            tbody.innerHTML = records.map(record => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${record.executionId}</div>
+                        <div class="text-sm text-gray-500">${record.type}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(record.status)}">
+                            ${record.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${formatDate(record.startTime)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${formatDuration(record.duration)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${record.executor}</div>
+                        <div class="text-sm text-gray-500">${record.executorIp}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="showExecutionDetails('${record.executionId}')" class="text-indigo-600 hover:text-indigo-900">
+                            Details
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStatistics(stats) {
+            document.getElementById('successRate').textContent = `${(stats.successRate * 100).toFixed(1)}%`;
+            document.getElementById('avgDuration').textContent = formatDuration(stats.averageExecutionTime);
+            document.getElementById('totalExecutions').textContent = stats.totalExecutions;
+            document.getElementById('failedExecutions').textContent = stats.failedExecutions;
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                PENDING: 'bg-yellow-100 text-yellow-800',
+                RUNNING: 'bg-blue-100 text-blue-800',
+                COMPLETED: 'bg-green-100 text-green-800',
+                FAILED: 'bg-red-100 text-red-800',
+                CANCELLED: 'bg-gray-100 text-gray-800',
+                TIMEOUT: 'bg-orange-100 text-orange-800',
+                RETRY: 'bg-purple-100 text-purple-800'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleString();
+        }
+
+        function formatDuration(duration) {
+            if (!duration) return 'N/A';
+            
+            const seconds = Math.floor(duration / 1000);
+            if (seconds < 60) return `${seconds}s`;
+            
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            if (minutes < 60) return `${minutes}m ${remainingSeconds}s`;
+            
+            const hours = Math.floor(minutes / 60);
+            const remainingMinutes = minutes % 60;
+            return `${hours}h ${remainingMinutes}m ${remainingSeconds}s`;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('refreshBtn').addEventListener('click', () => {
+                loadExecutionRecords();
+                loadStatistics();
+            });
+
+            document.getElementById('exportBtn').addEventListener('click', async () => {
+                try {
+                    const loader = JobFlow.UI.showLoading();
+                    const data = await JobFlow.api.exportExecutionRecords();
+                    
+                    const blob = new Blob([data], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'execution_records.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    
+                    JobFlow.UI.hideLoading(loader);
+                } catch (error) {
+                    JobFlow.UI.showNotification(error.message, 'error');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
